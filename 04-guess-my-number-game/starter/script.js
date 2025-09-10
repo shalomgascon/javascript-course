@@ -1,108 +1,128 @@
 'use strict';
 
-// DOM Elements Selection
+// constants
+const MIN_NUMBER = 1;
+const MAX_NUMBER = 20;
+const STARTING_SCORE  = 20;
+
+
+// Cached selectors
+const bodyEl = document.body;
 const messageEl = document.querySelector(".message");
-// console.log (messageEl);
-
-// messageEl.textContent = "Hello from Javascript";
-
 const scoreEl = document.querySelector(".score");
-// console.log(scoreEl);
-
-// scoreEl.textContent = 15;
-
 const numberEl = document.querySelector(".number");
-// numberEl.textContent = 10; 
-
 const highscoreEl = document.querySelector(".highscore");
-// highscoreEl.textContent = 18; 
-
 const guessInputEl = document.querySelector(".guess");
-// guessInputEl.value = 6;
+const checkBtnEl = document.querySelector('.check');
+const againBtnEl = document.querySelector('.again');
+
+// UI Helpers
+function setMessage(text) {
+    messageEl.textContent = text;
+}
+
+function setNumber(value) {
+    numberEl.textContent = value;
+}
+
+function setScore(value) {
+    scoreEl.textContent = value;
+}
+
+function setHighScore(value) {
+    highscoreEl.textContent = value;
+}
+
+function setBackground(color) {
+    bodyEl.style.backgroundColor = color;
+}
+
+function disablePlay(disabled) {
+    guessInputEl.disabled = disabled;
+    checkBtnEl.disabled = disabled;
+}
+
+function clearInput () {
+    guessInputEl.value = '';
+}
+
+
 
 ///////////////////////
 // Game state variables
-let secretNumber = Math.trunc(Math.random() * 20) +  1;
+let secretNumber = Math.trunc(Math.random() * MAX_NUMBER) +  MIN_NUMBER;
 console.log('Your Secret number is: ', secretNumber);
 
-let score = 20;
+let score = STARTING_SCORE;
 let highscore = 0;
 
-document.querySelector('.score').textContent = score;
-document.querySelector('.highscore').textContent = highscore;
+function resetGameState() {
+    score = STARTING_SCORE;
+    secretNumber = Math.trunc(Math.random() * MAX_NUMBER) +  MIN_NUMBER;
+}
+
+function renderInitailUI() {
+    setMessage('Start Guessing...');
+    setNumber('?');
+    setScore(score);
+    clearInput('');
+    disablePlay(false);
+    setBackground('');
+}
+
+renderInitailUI();
 
 
 ///////////////////////
 // Basic Game Logic
-document.querySelector('.check').addEventListener('click', function() {
+checkBtnEl.addEventListener('click', function() {
     // Code Block
-    console.log('Check button clicked');
-    const guess = Number(document.querySelector('.guess').value);
+    const guess = Number(guessInputEl.value);
     console.log("Players guessed: ", guess);
 
-    if (!guess) {
-    document.querySelector('.message').textContent = 'No number!';
-    return; 
-  }
+    if (!guess) return setMessage('Please input a number!');
 
-  if (guess < 1 || guess > 20) {
-    document.querySelector('.message').textContent =
-      'Number must be between 1 and 20!';
-    return; 
+  if (guess < MIN_NUMBER || guess > MAX_NUMBER) {
+    return setMessage(
+      `Number must be between ${MIN_NUMBER} and ${MAX_NUMBER}!`
+    );; 
   }
 
     if (guess === secretNumber) {
-        console.log('Correct Guess!!!!!!!');
-        document.querySelector('.number').textContent = secretNumber;
+        setMessage('🎉 MAGALING KANG KUPAL KA!');
+        setNumber(secretNumber);
+        setBackground('green');
         if (score > highscore) {
             highscore = score;
-            document.querySelector('.highscore').textContent = highscore;
+            setHighScore(highscore);
         }
-        document.querySelector('.guess').disabled = true;
-        document.querySelector('.check').disabled = true;
-        document.querySelector('.message').textContent = "You Won!!!!!!!";
-        document.body.style.backgroundColor = 'green';
-        document.querySelector('.guess').value = '';
-    } else if (guess > secretNumber) {
-        console.log("Too Highhhh");
-        document.querySelector('.message').textContent = "Too Highhhhhh!!!!";
-        score --;
-        document.querySelector('.score').textContent = score;
-        if (score < 1) {
-            document.querySelector('message').textContent = "HAHAHAHAH NATALO, IPRESS MO YUNG AGAIN!!!";
-            document.querySelector('.number').textContent = secretNumber; 
-            document.querySelector('.guess').disabled = true;
-            document.querySelector('.check').disabled = true;
-            document.body.style.backgroundColor = 'red';
-            document.querySelector('.guess').value = '';
-        }
-    } else if (guess < secretNumber) {
-        console.log("Too Lowwww");
-        document.querySelector('.message').textContent = "Too Lowwwww!!!!!";
-        score --;
-        document.querySelector('.score').textContent = score;
-        if (score < 1) {
-            document.querySelector('.message').textContent = "HAHAHAHAH NATALO, IPRESS MO YUNG AGAIN!!!";
-            document.querySelector('.number').textContent = secretNumber; 
-            document.querySelector('.guess').disabled = true;
-            document.querySelector('.check').disabled = true;
-            document.body.style.backgroundColor = 'red';
-            document.querySelector('.guess').value = '';
-        }
+        disablePlay(true);
+        clearInput();
+        return;
+    } 
+
+    setMessage(guess > secretNumber ? '📈 Too high!' : '📉 Too low!');
+    score--;
+    setScore(score);
+
+    if (score < 1) {
+        setMessage('💥 ARAY KO! UMULIT KA');
+        setNumber(secretNumber)
+        setBackground('red');
+        disablePlay(true);
+        clearInput();
     }
 });
 
-document.querySelector('.again').addEventListener('click', function() {
-    score = 20;
-    secretNumber = Math.trunc(Math.random() * 20) +  1;
-    document.querySelector('.message').textContent = 'Start Guessinggggggg';
-    document.querySelector('.number').textContent = '?';
-    document.querySelector('.score').textContent = score;
-    document.querySelector('.guess').value = ' ';
+window.addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && !checkBtnEl.disabled) {
+    checkBtnEl.click();
+  }
+});
 
-    document.querySelector('.guess').disabled = false;
-    document.querySelector('.check').disabled = false;
-    document.body.style.backgroundColor = '';
+againBtnEl.addEventListener('click', function() {
+    resetGameState();
+    renderInitailUI();
 });
 
 
