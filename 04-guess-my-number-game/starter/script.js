@@ -40,6 +40,17 @@ document.querySelector('.check').addEventListener('click', function() {
     const guess = Number(document.querySelector('.guess').value);
     console.log("Players guessed: ", guess);
 
+    if (!guess) {
+    document.querySelector('.message').textContent = 'No number!';
+    return; 
+  }
+
+  if (guess < 1 || guess > 20) {
+    document.querySelector('.message').textContent =
+      'Number must be between 1 and 20!';
+    return; 
+  }
+
     if (guess === secretNumber) {
         console.log('Correct Guess!!!!!!!');
         document.querySelector('.number').textContent = secretNumber;
@@ -50,16 +61,20 @@ document.querySelector('.check').addEventListener('click', function() {
         document.querySelector('.guess').disabled = true;
         document.querySelector('.check').disabled = true;
         document.querySelector('.message').textContent = "You Won!!!!!!!";
+        document.body.style.backgroundColor = 'green';
+        document.querySelector('.guess').value = '';
     } else if (guess > secretNumber) {
         console.log("Too Highhhh");
         document.querySelector('.message').textContent = "Too Highhhhhh!!!!";
         score --;
         document.querySelector('.score').textContent = score;
         if (score < 1) {
-            document.querySelector('message').textContent = "Saddddd, You lost!!!!";
+            document.querySelector('message').textContent = "HAHAHAHAH NATALO, IPRESS MO YUNG AGAIN!!!";
             document.querySelector('.number').textContent = secretNumber; 
             document.querySelector('.guess').disabled = true;
             document.querySelector('.check').disabled = true;
+            document.body.style.backgroundColor = 'red';
+            document.querySelector('.guess').value = '';
         }
     } else if (guess < secretNumber) {
         console.log("Too Lowwww");
@@ -67,10 +82,12 @@ document.querySelector('.check').addEventListener('click', function() {
         score --;
         document.querySelector('.score').textContent = score;
         if (score < 1) {
-            document.querySelector('.message').textContent = "Saddddd, You lost!!!!";
+            document.querySelector('.message').textContent = "HAHAHAHAH NATALO, IPRESS MO YUNG AGAIN!!!";
             document.querySelector('.number').textContent = secretNumber; 
             document.querySelector('.guess').disabled = true;
             document.querySelector('.check').disabled = true;
+            document.body.style.backgroundColor = 'red';
+            document.querySelector('.guess').value = '';
         }
     }
 });
@@ -85,6 +102,7 @@ document.querySelector('.again').addEventListener('click', function() {
 
     document.querySelector('.guess').disabled = false;
     document.querySelector('.check').disabled = false;
+    document.body.style.backgroundColor = '';
 });
 
 
