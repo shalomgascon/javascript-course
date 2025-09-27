@@ -20,7 +20,7 @@ const btnRollEl = document.querySelector('.btn--roll');
 
 const btnHoldEl = document.querySelector('.btn--hold');
 
-
+const btnNewEl = document.querySelector('.btn--new');
 
 // game initialization function
 const init = function () {
@@ -79,9 +79,21 @@ btnHoldEl.addEventListener('click', function () {
     scores[activePlayer] += currentScore;
     document.getElementById(`score--${activePlayer}`).textContent =
       scores[activePlayer];
-    switchPlayer();
+    if (scores[activePlayer] >= 100) {
+      playing = false;
+      diceEl.classList.add('hidden');
+
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.add('player--winner');
+
+      document
+        .querySelector(`.player--${activePlayer}`)
+        .classList.remove('player--active');
+    } else {
+      switchPlayer();
+    }
   }
 });
 
-const btnNewEl = document.querySelector('.btn--new');
 btnNewEl.addEventListener('click', init);
