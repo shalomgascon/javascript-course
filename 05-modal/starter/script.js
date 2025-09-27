@@ -12,20 +12,38 @@ const btnCloseModalEl = document.querySelector('.close-modal');
 // open modal
 const btnOpenModalEl = document.querySelectorAll('.show-modal');
 
-console.log('Open Buttons: ', btnOpenModalEl.length);
+let lastFocusedButton = null;
 
 const openModal = function () {
   modalEl.classList.remove('hidden');
   overlayEl.classList.remove('hidden');
-};
 
-btnOpenModalEl.forEach(btn => btn.addEventListener('click', openModal));
+  modalEl.focus();
+  lastFocusedButton = document.activeElement;
+};
 
 const closeModal = function () {
-  modalEl.classList.add('hidden');
-  overlayEl.classList.add('hidden');
+    modalEl.classList.add('hidden');
+    overlayEl.classList.add('hidden');
+    if (lastFocusedButton) {
+        lastFocusedButton.focus();
+    }
 };
 
+
+btnOpenModalEl.forEach(btn => btn.addEventListener('click', openModal));
 btnCloseModalEl.addEventListener('click', closeModal);
 overlayEl.addEventListener('click', closeModal);
+
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !modalEl.classList.contains('hidden')) {
+        closeModal();
+    }
+});
+
+modalEl.setAttribute('role', 'dialog');
+modalEl.setAttribute('aria-modal', 'true');
+
+btnCloseModalEl.setAttribute('aria-label', 'Close modal');
+
 
