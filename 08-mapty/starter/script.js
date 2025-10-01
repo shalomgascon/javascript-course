@@ -98,3 +98,108 @@ console.log(
   cycling1 instanceof Workout
 );
  
+console.log('=== TESTING GEOLOCATION API ===');
+
+class App {
+    #map;
+    #mapZoomLevel = 13;
+    #mapEvent;
+    #workouts = [];
+
+    constructor() {
+        console.log('App  is starting');
+        this._getPosition();
+    }
+
+    _getPosition() {
+        if (navigator.geolocation) {
+    console.log('🔍 Requesting user location...');
+    navigator.geolocation.getCurrentPosition(
+      this._loadMap.bind(this), 
+      this._handleLocationError.bind(this),
+      {
+        timeout: 10000,
+        enableHighAccuracy: true,
+        maximumAge: 600000,
+      }
+        );
+    } else {
+        alert('❌ Geolocation is not supported by this browser');
+        this._loadDefaultMap();
+        }
+    }
+
+    _handleLocationError(error) {4
+        console.error('Geolocation error:', error);
+
+        let message = 'Could not get your position. ';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message +=
+              'Location access was denied. Please enable location services and refresh the page.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message += 'Location information is unavailable.';
+            break;
+          case error.TIMEOUT:
+            message += 'Location request timed out.';
+            break;
+          default:
+            message += 'An unknown error occurred.';
+            break;
+        }
+
+        alert(`📍 ${message}`);
+        this._loadDefaultMap();
+    }
+
+    _loadDefaultMap() {
+    console.log('Loading default map location (Manila');
+
+    const defaultCoords = [14.604, 120.994]
+
+    this.#map = L.map('map').setView(defaultCoords, this.#mapZoomLevel);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(this.#map);
+
+    this.#map.on('click', this._showForm.bind(this));
+
+    console.log('Default map loaded successfully');
+    }
+
+    _loadMap(position) {
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+    const coords = [latitude, longitude];
+
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(this.#map);
+
+    // Add click event listener
+    this.#map.on('click', this._showForm.bind(this));
+  }
+
+    _showForm(mapE) {
+        this.#mapEvent = mapE;
+    const { lat, lng } = mapE.latlng;
+
+    console.log(`Map clicked at: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+
+    // Add a temporary marker to show where user clicked
+    L.marker([lat, lng])
+      .addTo(this.#map)
+      .bindPopup(`Clicked here: ${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+      .openPopup();
+  }
+}
+
+const app = new App();
+console.log('Hour 2 complete!');
